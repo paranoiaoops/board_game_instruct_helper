@@ -1,0 +1,27 @@
+name: Convert and Deploy
+
+on:
+  push:
+    branches:
+      - main  # Set a branch to deploy
+  pull_request:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+    name: Build Asciidoctor
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install asciidoctor
+        run: sudo apt-get install asciidoctor
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        if: ${{ github.ref == 'refs/heads/main' }}
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
